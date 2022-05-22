@@ -1,0 +1,16 @@
+.column{
+    float: left;
+    width: 50%;
+}
+
+canvas{
+    width: 99%;
+    height: 100%;
+    border: 1px solid black;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
