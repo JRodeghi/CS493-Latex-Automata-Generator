@@ -3,23 +3,17 @@
 <head>
     <title>Latex Graph Generator</title>
     <link rel="stylesheet" href="src/style.css">
+    <script src = "src/main.js"> </script>
 </head>
-<body>
 
+<body>
     <center><h1>Latex Automata Generator</h1></center>
      
     <p>Writen by Joel Rodeghiero for cs493 at the University of Tennesse - Knoxville</p>
 
-    <div class="row">
-        <div class = "column">
-            <center><h1>Automata</h1></center>
-            <canvas id="Graph canvas" > </canvas>
-        </div>
-        <div class = "column">
-            <center><h1>Latex</h1></center>
-            <canvas id="Latex canvas"> </canvas>
-        </div>
-    </div>
+    <center><h1>Automata</h1></center>
+    <canvas id="grph" onclick="draw_circle(event);"> </canvas>
+    
             
 </body>
 </html>
