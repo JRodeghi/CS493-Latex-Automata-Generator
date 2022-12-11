@@ -19,22 +19,11 @@ function getMousePos(automata_canvas, evt) {
     };
 }
 
-function file_reader(file)
+function file_parser(file_contents)
 {
+    const jobj = JSON.parse(file_contents);
 
-    file.json()
-    /*const reader = new FileReader();
-    reader.addEventListener('load',(event) => {
-        const result = event.target.result;
-        return result;
-    });
-
-    reader.readAsText(file);*/
-}
-
-function file_parser(str)
-{
-    alert(str);
+    console.log(jobj["fsa"]['states'])
 }
 
 function selectFile() {
