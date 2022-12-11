@@ -3,7 +3,7 @@
 <head>
     <title>Latex Graph Generator</title>
     <link rel="stylesheet" href="src/style.css">
-    <script src = "src/main.js"> </script>
+    <script src="src/index.js"> </script>
 </head>
 
 <body>
@@ -13,10 +13,16 @@
 
     <center><h1>Automata</h1></center>
     <center>
-        <input id = "import_NFA" type = "file"/>
+        <button id = "import">Import</button>
+        <script>
+            document.querySelector('#import').addEventListener('click', () => {
+                selectFile().then(contents => {
+                    file_parser(contents);
+                })
+            });
+        </script>
+
     </center>
     <canvas id="grph" onclick="draw_circle(event);"> </canvas>
-    
-            
 </body>
 </html>

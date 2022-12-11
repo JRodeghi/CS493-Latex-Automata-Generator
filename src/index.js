@@ -19,7 +19,25 @@ function getMousePos(automata_canvas, evt) {
     };
 }
 
-export function selectFile() {
+function file_reader(file)
+{
+
+    file.json()
+    /*const reader = new FileReader();
+    reader.addEventListener('load',(event) => {
+        const result = event.target.result;
+        return result;
+    });
+
+    reader.readAsText(file);*/
+}
+
+function file_parser(str)
+{
+    alert(str);
+}
+
+function selectFile() {
     return new Promise(resolve => {
         const input = document.createElement('input')
         input.type = 'file'
@@ -38,10 +56,3 @@ export function selectFile() {
         input.click()
     })
 }
-
-const import_NFA = document.getElementById("import_NFA");
-import_NFA.addEventListener("change",() => {
-    alert("Test")
-    selectFile().then(contents => alert(contents))
-
-});
