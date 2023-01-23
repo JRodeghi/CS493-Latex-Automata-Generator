@@ -21,9 +21,64 @@ function getMousePos(automata_canvas, evt) {
 
 function file_parser(file_contents)
 {
+    const output = document.getElementById("output")
     const jobj = JSON.parse(file_contents);
 
-    console.log(jobj["fsa"]['states'])
+    nodes = jobj["nodes"]
+
+    let out = "";
+    for(let i = 0; i < nodes.length;i++)
+    {
+        let state = "state";
+        let loc_prev_x = 0;
+        let loc_prev_y = 0;
+
+        if (jobj["fsa"].startState == nodes[i].label)
+        {
+            state += ",initial";
+        }
+        if (jobj["fsa"].acceptStates == nodes[i].label)
+        {
+            state += ",accepting";
+        }
+
+        if(i > 0)
+        {
+            loc_prev_x = nodes[i - 1].loc.x;
+            loc_prev_y = nodes[i - 1].loc.y;
+        }
+        let loc_current_x = nodes[i].loc.x;
+        let loc_current_y = nodes[i].loc.y;
+
+        let loc = "";
+        if(i == 0)
+        {
+            loc = loc + " ";
+        }
+        else{
+            if(loc_current_y > loc_prev_y) {
+                loc = loc + "above ";
+            }
+            if(loc_current_y < loc_prev_y) {
+                loc = loc + "below ";
+            }
+
+            if(loc_current_x > loc_prev_x) 
+            {
+                loc = loc + "right ";
+            }
+            if(loc_current_x < loc_prev_x)
+            {
+                loc = loc + "left ";
+            }
+            
+            loc = loc + " of = " + nodes[i-1].label
+        }
+
+        out = out + "\\node["+state+"] (" + nodes[i].label + ") [" + loc + "] {$" + nodes[i].label + "$};\n"
+    }
+
+    output.innerText = out
 }
 
 function selectFile() {
