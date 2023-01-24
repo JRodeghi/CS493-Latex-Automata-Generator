@@ -18,11 +18,112 @@ function getMousePos(automata_canvas, evt) {
         y: evt.clientY - rect.top
     };
 }
+function stem_file_parser(file_contents)
+{
+    const output = document.getElementById("output");
+    file_lines=file_contents.split("\n");
+
+    let out = "";
+
+    let prev_x;
+    let prev_y;
+    let prev_lable;
+
+    let i = 5;
+    //create nodes
+    for(i;i < file_lines.length;i++)
+    {
+        if (file_lines[i] == "") {
+            break;
+        }
+
+        node = file_lines[i].split(" ");
+        node[0] = node[0].replace("\t","");
+        
+        let lable = node[0];
+        let x= node[1];
+        let y = node[2];
+        let start = node[3];
+        let accept = node[4];
+
+        let loc = "";
+
+        if(i != 5)
+        {
+            if (y > prev_y) {
+                loc = loc + "above ";
+            }
+            if (y < prev_y) {
+                loc = loc + "below ";
+            }
+
+            if (x > prev_x) {
+                loc = loc + "right ";
+            }
+            if (x < prev_x) {
+                loc = loc + "left ";
+            }
+
+            loc = loc + " of = " + prev_lable;
+        }
+
+        let state = "state";
+        if(start == "true")
+        {
+            state += ",initial"; 
+        }
+        if(accept == "true")
+        {
+            state += ",accepting";
+        }
+
+        out = out + "\\node[" + state + "] (" + lable + ") [" + loc + "] {$" + lable + "$};\n"
+
+        prev_x = x;
+        prev_y = y;
+        prev_lable = lable;
+
+    }
+    //create paths
+
+    for(i = i+4;i < file_lines.length;i++)
+    {
+        if (file_lines[i] == "") {
+            break;
+        }
+        path = file_lines[i].split(" ");
+        path[0] = path[0].replace("\t","");
+        
+        let from = path[0];
+        let to = path[1];
+
+        let plabel = path[2] + "|" + path[3] +"|" + path[path.length-1];
+
+        if(from == to)
+        { 
+            out += "\\path (" + from + ") edge [loop above]   node {$" + plabel + "$} (" + to + ");\n"; 
+        }
+        else
+        {
+            out += "\\path (" + from + ") edge [bend right]   node {$" + plabel + "$} (" + to + ");\n";
+        }
+        
+    }
+
+    output.innerText = out;
+}
 
 function file_parser(file_contents)
 {
-    const output = document.getElementById("output")
-    const jobj = JSON.parse(file_contents);
+    const output = document.getElementById("output");
+    let jobj;
+    try{
+         jobj = JSON.parse(file_contents);
+    }catch(error)
+    {
+        stem_file_parser(file_contents);
+        return 0;
+    }
 
     nodes = jobj["nodes"]
 
@@ -57,10 +158,14 @@ function file_parser(file_contents)
             loc = loc + " ";
         }
         else{
-            if(loc_current_y > loc_prev_y) {
+            if(loc_current_y < loc_prev_y + 30 && loc_current_y > loc_prev_y - 30)
+            {
+
+            }
+            else if(loc_current_y < loc_prev_y) {
                 loc = loc + "above ";
             }
-            if(loc_current_y < loc_prev_y) {
+            else if(loc_current_y > loc_prev_y) {
                 loc = loc + "below ";
             }
 
@@ -78,6 +183,8 @@ function file_parser(file_contents)
 
         out = out + "\\node["+state+"] (" + nodes[i].label + ") [" + loc + "] {$" + nodes[i].label + "$};\n"
     }
+
+    out += "\n";
 
     //print out the paths
     for(let i = 0; i < nodes.length;i++)
@@ -108,7 +215,8 @@ function file_parser(file_contents)
         }
     }
 
-    output.innerText = out
+    output.innerText = out;
+    return 0;
 }
 
 function selectFile() {

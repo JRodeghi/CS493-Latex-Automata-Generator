@@ -1,0 +1,35 @@
+// Save File for STEM
+// Version 1.00
+
+// State Format: name x y start accept
+STATES:
+	5 398.000000 247.000000 false false 0.980392 0.980392 0.823529 1.000000
+	3 206.000000 83.000000 false false 0.980392 0.980392 0.823529 1.000000
+	2 530.000000 101.000000 false false 0.980392 0.980392 0.823529 1.000000
+	-1 531.000000 343.000000 false true 0.980392 0.980392 0.823529 1.000000
+	1 780.000000 102.000000 true false 0.980392 0.980392 0.823529 1.000000
+	6 350.000000 345.000000 false false 0.980392 0.980392 0.823529 1.000000
+	4 210.000000 335.000000 false false 0.980392 0.980392 0.823529 1.000000
+
+// Transition format: fromStateId toStateId readCHar writeChar moveDirection
+// The Character '~' is the catchall character
+TRANSITION:
+	2 -1    RIGHT
+	2 3 0 x RIGHT
+	3 5     LEFT
+	3 3 x x RIGHT
+	5 5 0 0 LEFT
+	5 5 x x LEFT
+	1 2 0 A RIGHT
+	2 2 x x RIGHT
+	5 2 A A RIGHT
+	3 4 0 0 RIGHT
+	4 3 0 x RIGHT
+	4 6     RIGHT
+	4 4 x x RIGHT
+
+// Tape format: tapeChar(0) tapeChar(1) ... tapeChar(n)
+TAPE:
+	9
+	Axxxxxxx  
+Start Triangle Position:0
