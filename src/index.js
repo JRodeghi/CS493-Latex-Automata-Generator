@@ -26,6 +26,7 @@ function file_parser(file_contents)
 
     nodes = jobj["nodes"]
 
+    //print out the nodes
     let out = "";
     for(let i = 0; i < nodes.length;i++)
     {
@@ -37,7 +38,7 @@ function file_parser(file_contents)
         {
             state += ",initial";
         }
-        if (jobj["fsa"].acceptStates == nodes[i].label)
+        if (nodes[i].acceptState == true)
         {
             state += ",accepting";
         }
@@ -76,6 +77,35 @@ function file_parser(file_contents)
         }
 
         out = out + "\\node["+state+"] (" + nodes[i].label + ") [" + loc + "] {$" + nodes[i].label + "$};\n"
+    }
+
+    //print out the paths
+    for(let i = 0; i < nodes.length;i++)
+    {
+        for(let j = 0; j < nodes.length;j++)
+        {
+            if(nodes[i].transitionText[nodes[j].label])
+            {
+                plabel = nodes[i].transitionText[nodes[j].label];
+
+                for(let k = 0; k < plabel.length;k++)
+                {
+                    if (plabel[k] == '\u03B5')
+                    {
+                        plabel[k] = "\\epsilon";
+                    }
+                }
+                if(i == j)
+                {
+                    out += "\\path (" + nodes[i].label + ") edge [loop above]   node {$" + plabel + "$} (" + nodes[j].label + ");\n";
+                }
+                else
+                {
+                    
+                    out += "\\path (" + nodes[i].label + ") edge [bend right]   node {$" + plabel + "$} (" + nodes[j].label + ");\n";
+                } 
+            }
+        }
     }
 
     output.innerText = out
