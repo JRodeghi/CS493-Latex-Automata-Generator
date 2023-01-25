@@ -1,33 +1,38 @@
-function draw_circle(e)
+function draw_circle(label,x,y)
 {
-    const automata_canvas = document.getElementById('grph');
-    const drawer = automata_canvas.getContext('2d');
-    var pos = getMousePos(automata_canvas, e);
-    posx = pos.x;
-    posy = pos.y;
-    drawer.fillStyle = "#000000";
-    drawer.beginPath();
-    drawer.arc(posx, posy, 10, 10, 2 * Math.PI);
-    drawer.fill();
+    const c = document.getElementById('canvas');
+    const ctx = c.getContext('2d');
+    posx = x;
+    posy = y;
+
+
+    console.log(posx);
+    console.log(posy);
+    console.log("\n");
+    ctx.font = "25px Georgia";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(posx, posy,32,0,2 * Math.PI);
+    ctx.fillText(label, posx, posy);
+    ctx.stroke();
 }
 
-function getMousePos(automata_canvas, evt) {
-    var rect = automata_canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
 function stem_file_parser(file_contents)
 {
     const output = document.getElementById("output");
     file_lines=file_contents.split("\n");
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
     let out = "";
+
 
     let prev_x;
     let prev_y;
     let prev_lable;
+    let posx = 0;
+    let posy = 0;
 
     let i = 5;
     //create nodes
@@ -50,21 +55,33 @@ function stem_file_parser(file_contents)
 
         if(i != 5)
         {
-            if (y > prev_y) {
-                loc = loc + "above ";
+            if (y < prev_y + 30 && y > prev_y - 30) {
+
             }
-            if (y < prev_y) {
+            else if (y > prev_y) {
+                loc = loc + "above ";
+                posy -= 100;
+            }
+            else if (y < prev_y) {
                 loc = loc + "below ";
+                posy += 100;
             }
 
-            if (x > prev_x) {
-                loc = loc + "right ";
-            }
             if (x < prev_x) {
+                loc = loc + "right ";
+                posx += 100;
+            }
+            if (x > prev_x) {
                 loc = loc + "left ";
+                posx -= 100;
             }
 
             loc = loc + " of = " + prev_lable;
+        }
+        else
+        {
+            posy = canvas.height/2;
+            posx = canvas.width/2;
         }
 
         let state = "state";
@@ -78,6 +95,7 @@ function stem_file_parser(file_contents)
         }
 
         out = out + "\\node[" + state + "] (" + lable + ") [" + loc + "] {$" + lable + "$};\n"
+        draw_circle(lable, posx, posy);
 
         prev_x = x;
         prev_y = y;
@@ -85,6 +103,8 @@ function stem_file_parser(file_contents)
 
     }
     //create paths
+
+    out += "\n";
 
     for(i = i+4;i < file_lines.length;i++)
     {
@@ -96,6 +116,15 @@ function stem_file_parser(file_contents)
         
         let from = path[0];
         let to = path[1];
+
+        if (path[path.length - 1] == "RIGHT")
+        {
+            path[path.length - 1] = "R";
+        }
+        if (path[path.length - 1] == "LEFT") {
+            path[path.length - 1] = "L";
+        }
+
 
         let plabel = path[2] + "|" + path[3] +"|" + path[path.length-1];
 
@@ -116,6 +145,10 @@ function stem_file_parser(file_contents)
 function file_parser(file_contents)
 {
     const output = document.getElementById("output");
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
     let jobj;
     try{
          jobj = JSON.parse(file_contents);
@@ -129,11 +162,15 @@ function file_parser(file_contents)
 
     //print out the nodes
     let out = "";
+    let posx = 0;
+    let posy = 0;
+
     for(let i = 0; i < nodes.length;i++)
     {
         let state = "state";
         let loc_prev_x = 0;
         let loc_prev_y = 0;
+
 
         if (jobj["fsa"].startState == nodes[i].label)
         {
@@ -149,6 +186,7 @@ function file_parser(file_contents)
             loc_prev_x = nodes[i - 1].loc.x;
             loc_prev_y = nodes[i - 1].loc.y;
         }
+
         let loc_current_x = nodes[i].loc.x;
         let loc_current_y = nodes[i].loc.y;
 
@@ -156,6 +194,8 @@ function file_parser(file_contents)
         if(i == 0)
         {
             loc = loc + " ";
+            posx = canvas.width / 2;
+            posy = canvas.height/2;
         }
         else{
             if(loc_current_y < loc_prev_y + 30 && loc_current_y > loc_prev_y - 30)
@@ -164,24 +204,30 @@ function file_parser(file_contents)
             }
             else if(loc_current_y < loc_prev_y) {
                 loc = loc + "above ";
+                posy -= 100;
             }
             else if(loc_current_y > loc_prev_y) {
                 loc = loc + "below ";
+                posy += 100;
             }
 
             if(loc_current_x > loc_prev_x) 
             {
                 loc = loc + "right ";
+                posx += 100;
+               
             }
             if(loc_current_x < loc_prev_x)
             {
                 loc = loc + "left ";
+                posx -= 100;
             }
             
             loc = loc + " of = " + nodes[i-1].label
         }
 
         out = out + "\\node["+state+"] (" + nodes[i].label + ") [" + loc + "] {$" + nodes[i].label + "$};\n"
+        draw_circle(nodes[i].label,posx,posy);
     }
 
     out += "\n";
