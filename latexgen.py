@@ -54,17 +54,20 @@ def parse_json(data):
                 prev = start_node
                 current = start_node.right
                 while True: 
+                    #right of current node
                     if current.x < nodes[i].x:
                         if current.right == "":
                             nodes[i].left = current
                             current.right = nodes[i]
                             break
+                    #inbetween current and prev
                     elif current.x > nodes[i].x:
                         current.left = nodes[i]
                         nodes[i].right = current
                         nodes[i].left = prev
                         prev.right = nodes[i]
                         break
+                    #keep going
                     else:
                         prev = current
                         current = current.right
@@ -78,20 +81,80 @@ def parse_json(data):
                 prev = start_node
                 current = start_node.left
                 while True: 
-                    if current.x < nodes[i].x:
+                    #left of current node
+                    if current.x > nodes[i].x:
                         if current.left == "":
                             nodes[i].right = current
                             current.left = nodes[i]
                             break
+                    #in between current and prev
                     elif current.x < nodes[i].x:
                         current.right = nodes[i]
                         nodes[i].left = current
                         nodes[i].right = prev
                         prev.left = nodes[i]
                         break
+                    #keep going
                     else:
                         prev = current
-                        current = current.right
+                        current = current.left
+        
+        #above (y is inverted for NFA - DFA)
+        if start_node.y > nodes[i].y and start_node.x + 10 > nodes[i].x and start_node.x - 10 < nodes[i].x:
+            if start_node.above == "":
+                nodes[i].below = start_node
+                start_node.above = nodes[i]
+            else:
+                prev = start_node
+                current = start_node.above
+                while True: 
+                    #left of current node
+                    if current.y > nodes[i].y:
+                        if current.above == "":
+                            nodes[i].below = current
+                            current.above = nodes[i]
+                            break
+                    #in between current and prev
+                    elif current.y < nodes[i].x:
+                        current.below = nodes[i]
+                        nodes[i].above = current
+                        nodes[i].below = prev
+                        prev.above = nodes[i]
+                        break
+                    #keep going
+                    else:
+                        prev = current
+                        current = current.above
+        #below
+        if start_node.y < nodes[i].y and start_node.x + 10 > nodes[i].x and start_node.x - 10 < nodes[i].x:
+            if start_node.below == "":
+                nodes[i].above = start_node
+                start_node.below = nodes[i]
+            else:
+                prev = start_node
+                current = start_node.below
+                while True: 
+                    #left of current node
+                    if current.y > nodes[i].y:
+                        if current.below == "":
+                            nodes[i].above = current
+                            current.below = nodes[i]
+                            break
+                    #in between current and prev
+                    elif current.y < nodes[i].x:
+                        current.above = nodes[i]
+                        nodes[i].below = current
+                        nodes[i].above = prev
+                        prev.below = nodes[i]
+                        break
+                    #keep going
+                    else:
+                        prev = current
+                        current = current.below
+        #above right
+        #above left
+        #below right
+        #below left
         
     #print out nodes
     for i in nodes:
