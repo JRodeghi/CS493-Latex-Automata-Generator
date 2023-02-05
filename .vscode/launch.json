@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-i","test.json","-o","test.txt"]
+            "args": ["-i","above-below-left-right.json","-o","test.txt"]
         }
     ]
 }
