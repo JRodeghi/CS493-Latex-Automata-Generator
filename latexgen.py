@@ -2,6 +2,8 @@ import json
 import sys
 import getopt
 
+
+
 class Node:
     def __init__(self,l,c,a,i,x,y):
         self.label= l
@@ -46,7 +48,6 @@ def layout_nodes(nodes,start):
             continue
         #right
         if start_node.x < nodes[i].x and start_node.y + 10 > nodes[i].y and start_node.y - 10 < nodes[i].y:
-            print(start_node.right == "")
             if start_node.right == "":
                 nodes[i].left = start_node
                 start_node.right = nodes[i]
@@ -157,7 +158,7 @@ def layout_nodes(nodes,start):
             if start_node.right == "" and start_node.above == "" and start_node.above_right == "":
                 start_node.above_right = nodes[i]
             #nodes to the right but not above
-            elif start_node.right != "" and start_node.above == "":
+            elif start_node.right != "":
                 prev = start_node
                 current = start_node.right
                 while True: 
@@ -190,7 +191,7 @@ def layout_nodes(nodes,start):
                                 else:
                                     prev = current
                                     current = current.above
-                            break
+                                break
 
                     #doesnt need to go anymore right
                     elif current.x > nodes[i].x:
@@ -222,7 +223,6 @@ def layout_nodes(nodes,start):
                                     prev = current
                                     current = current.above
                             break
-
                     #keep going
                     else:
                         prev = current
@@ -267,7 +267,7 @@ def layout_nodes(nodes,start):
                         #cant go right
                         if current.right == "":
                             current.right = nodes[i]
-                            nodes[i].left = nodes[i]
+                            nodes[i].left = current
                             break
                         # needs to go right
                         elif current.right != "":
@@ -291,7 +291,7 @@ def layout_nodes(nodes,start):
                                 else:
                                     prev = current
                                     current = current.right
-                        break
+                            break
                     #keep going
                     else:
                         prev = current
@@ -304,7 +304,7 @@ def layout_nodes(nodes,start):
             if start_node.left == "" and start_node.above == "" and start_node.above_left == "":
                 start_node.above_left = nodes[i]
             #nodes to the left but not above
-            elif start_node.left != "" and start_node.above == "":
+            elif start_node.left != "" :
                 prev = start_node
                 current = start_node.left
                 while True: 
@@ -339,7 +339,7 @@ def layout_nodes(nodes,start):
                                     current = current.above
                             break
 
-                    #doesnt need to go anymore right
+                    #doesnt need to go anymore left
                     elif current.x > nodes[i].x:
                         #cant go up
                         if current.above == "":
@@ -449,177 +449,31 @@ def layout_nodes(nodes,start):
             # no nodes to the below or to the right 
             if start_node.right == "" and start_node.below == "" and start_node.below_right == "":
                 start_node.below_right = nodes[i]
-            #nodes to the right but not below
-            elif start_node.right != "" and start_node.below == "":
+            #nodes to the right
+            elif start_node.right != "":
                 prev = start_node
                 current = start_node.right
-                while True: 
+                while True:
                     #right of current node
-                    if current.x < nodes[i].x:
+                    if current.x <= nodes[i].x:
                         #cant go anymore right and cant go up
                         if current.right == "" and current.below == "":
                             current.below = nodes[i]
                             nodes[i].above = current
                             break
-                        #cant go anymore right but can go up
+                        #cant go right but can go down
                         elif current.right == "" and current.below != "":
-                            prev = current
-                            current = current.below
+                            prev = start_node
+                            current = start_node.below
                             while True: 
-                                #below of current node
-                                if current.y < nodes[i].y:
+                                #left of current node
+                                if current.y > nodes[i].y:
                                     if current.below == "":
                                         nodes[i].above = current
                                         current.below = nodes[i]
-                                        break
-                                #in between current and prev
-                                elif current.y > nodes[i].y:
-                                    current.below = nodes[i]
-                                    nodes[i].above = current
-                                    nodes[i].below = prev
-                                    prev.above = nodes[i]
-                                    break
-                                #keep going
-                                else:
-                                    prev = current
-                                    current = current.below
-                            break
-
-                    #doesnt need to go anymore right
-                    elif current.x > nodes[i].x:
-                        #cant go up
-                        if current.below == "":
-                            current.above = nodes[i]
-                            nodes[i].below = current
-                            break
-                        #node needs to go up
-                        elif current.below != "":
-                            prev = current
-                            current = current.above
-                            while True: 
-                                #above of current node
-                                if current.y > nodes[i].y:
-                                    if current.above == "":
-                                        nodes[i].below = current
-                                        current.above = nodes[i]
                                         break
                                 #in between current and prev
                                 elif current.y < nodes[i].y:
-                                    current.below = nodes[i]
-                                    nodes[i].above = current
-                                    nodes[i].below = prev
-                                    prev.above = nodes[i]
-                                    break
-                                #keep going
-                                else:
-                                    prev = current
-                                    current = current.above
-                            break
-
-                    #keep going
-                    else:
-                        prev = current
-                        current = current.right
-            #cant go right but can go up
-            elif start_node.right == "" and start_node.above != "":
-                prev = start_node
-                current = start_node.above
-                while True: 
-                    #above of current node
-                    if current.y > nodes[i].y:
-                        #cant go up and cant go right
-                        if current.above == "" and current.right == "":
-                            nodes[i].left = current
-                            current.right = nodes[i]
-                            break
-                        #cant go up but can go right
-                        elif current.above == "" and current.right != "":
-                            prev = current
-                            current = current.right
-                            while True: 
-                                #right of current node
-                                if current.x < nodes[i].x:
-                                    if current.right == "":
-                                        nodes[i].left = current
-                                        current.right = nodes[i]
-                                        break
-                                #inbetween current and prev
-                                elif current.x > nodes[i].x:
-                                    current.left = nodes[i]
-                                    nodes[i].right = current
-                                    nodes[i].left = prev
-                                    prev.right = nodes[i]
-                                    break
-                                #keep going
-                                else:
-                                    prev = current
-                                    current = current.right
-                            
-                    #doesnt need to go up any more
-                    elif current.y < nodes[i].y:
-                        #cant go right
-                        if current.right == "":
-                            current.right = nodes[i]
-                            nodes[i].left = nodes[i]
-                            break
-                        # needs to go right
-                        elif current.right != "":
-                            prev = current
-                            current = current.right
-                            while True: 
-                                #right of current node
-                                if current.x < nodes[i].x:
-                                    if current.right == "":
-                                        nodes[i].left = current
-                                        current.right = nodes[i]
-                                        break
-                                #inbetween current and prev
-                                elif current.x > nodes[i].x:
-                                    current.left = nodes[i]
-                                    nodes[i].right = current
-                                    nodes[i].left = prev
-                                    prev.right = nodes[i]
-                                    break
-                                #keep going
-                                else:
-                                    prev = current
-                                    current = current.right
-                        break
-                    #keep going
-                    else:
-                        prev = current
-                        current = current.above
-                break
-        #below left
-        elif start_node.x < nodes[i].x and start_node.y < nodes[i].y:
-            # no nodes to the above or to the left 
-            if start_node.left == "" and start_node.below == "" and start_node.below_left == "":
-                start_node.below_left = nodes[i]
-            #nodes to the left but not above
-            elif start_node.left != "" and start_node.below == "":
-                prev = start_node
-                current = start_node.left
-                while True: 
-                    #left of current node
-                    if current.x < nodes[i].x:
-                        #cant go anymore left and cant go up
-                        if current.left == "" and current.below == "":
-                            current.below = nodes[i]
-                            nodes[i].above = current
-                            break
-                        #cant go anymore left but can go up
-                        elif current.left == "" and current.below != "":
-                            prev = current
-                            current = current.below
-                            while True: 
-                                #left of current node
-                                if current.y < nodes[i].y:
-                                    if current.below == "":
-                                        nodes[i].above = current
-                                        current.below = nodes[i]
-                                        break
-                                #in between current and prev
-                                elif current.y > nodes[i].y:
                                     current.above = nodes[i]
                                     nodes[i].below = current
                                     nodes[i].above = prev
@@ -630,94 +484,61 @@ def layout_nodes(nodes,start):
                                     prev = current
                                     current = current.below
                             break
-
-                    #doesnt need to go anymore left
-                    elif current.x > nodes[i].x:
-                        #cant go up
-                        if current.above == "":
-                            current.above = nodes[i]
-                            nodes[i].below = current
+                        #doesnt need to go anymore right
+                    elif current.x >= nodes[i].x:
+                        #cant go down
+                        if current.below == "":
+                            current.below = nodes[i]
+                            nodes[i].above = current
                             break
-                        #node needs to go up
-                        elif current.above != "":
-                            prev = current
-                            current = current.above
+                        #needs to go down
+                        if current.below != "":
+                            prev = start_node
+                            current = start_node.below
                             while True: 
-                                #above of current node
+                                #left of current node
                                 if current.y > nodes[i].y:
-                                    if current.above == "":
-                                        nodes[i].below = current
-                                        current.above = nodes[i]
+                                    if current.below == "":
+                                        nodes[i].above = current
+                                        current.below = nodes[i]
                                         break
                                 #in between current and prev
                                 elif current.y < nodes[i].y:
-                                    current.below = nodes[i]
-                                    nodes[i].above = current
-                                    nodes[i].below = prev
-                                    prev.above = nodes[i]
+                                    current.above = nodes[i]
+                                    nodes[i].below = current
+                                    nodes[i].above = prev
+                                    prev.below = nodes[i]
                                     break
                                 #keep going
                                 else:
                                     prev = current
-                                    current = current.above
+                                    current = current.below
                             break
-
-                    #keep going
                     else:
                         prev = current
-                        current = current.left
-            #cant go left but can go up
-            elif start_node.left == "" and start_node.above != "":
+                        current = current.right
+            #cant go right but can go down
+            elif start_node.right == "" and start_node.below != "":
                 prev = start_node
-                current = start_node.above
-                while True: 
-                    #above of current node
+                current = start_node.below
+                while True:
+                    #below of current node
                     if current.y > nodes[i].y:
-                        #cant go up and cant go left
-                        if current.above == "" and current.left == "":
+                        #cant go down and cant go to the right
+                        if current.down == "" and current.right == "":
                             nodes[i].left = current
-                            current.left = nodes[i]
+                            current.right = nodes[i]
                             break
-                        #cant go up but can go left
-                        elif current.above == "" and current.left != "":
+                        #cant go down but can go right
+                        elif current.below == "" and current.right != "":
                             prev = current
-                            current = current.left
+                            current = current.right
                             while True: 
-                                #left of current node
+                                #right of current node
                                 if current.x < nodes[i].x:
-                                    if current.left == "":
-                                        nodes[i].right = current
-                                        current.left = nodes[i]
-                                        break
-                                #inbetween current and prev
-                                elif current.x > nodes[i].x:
-                                    current.left = nodes[i]
-                                    nodes[i].right = current
-                                    nodes[i].left = prev
-                                    prev.left = nodes[i]
-                                    break
-                                #keep going
-                                else:
-                                    prev = current
-                                    current = current.left
-                            
-                    #doesnt need to go up any more
-                    elif current.y < nodes[i].y:
-                        #cant go left
-                        if current.left == "":
-                            current.left = nodes[i]
-                            nodes[i].right = nodes[i]
-                            break
-                        # needs to go elft
-                        elif current.rileftght != "":
-                            prev = current
-                            current = current.left
-                            while True: 
-                                #left of current node
-                                if current.x < nodes[i].x:
-                                    if current.left == "":
-                                        nodes[i].right = current
-                                        current.left = nodes[i]
+                                    if current.right == "":
+                                        nodes[i].left = current
+                                        current.right = nodes[i]
                                         break
                                 #inbetween current and prev
                                 elif current.x > nodes[i].x:
@@ -730,20 +551,189 @@ def layout_nodes(nodes,start):
                                 else:
                                     prev = current
                                     current = current.right
-                        break
+                    
+                    #doesnt need to go down anymore
+                    elif current.y > nodes[i].y:
+                        #cant go right
+                        if current.right == "":
+                            current.right = nodes[i]
+                            nodes[i].left = current
+                            break
+                        #needs to go right
+                        elif current.x < nodes[i].y:
+                            prev = current
+                            current = current.right
+                            while True: 
+                                #right of current node
+                                if current.x < nodes[i].x:
+                                    if current.right == "":
+                                        nodes[i].left = current
+                                        current.right = nodes[i]
+                                        break
+                                #inbetween current and prev
+                                elif current.x > nodes[i].x:
+                                    current.left = nodes[i]
+                                    nodes[i].right = current
+                                    nodes[i].left = prev
+                                    prev.right = nodes[i]
+                                    break
+                                #keep going
+                                else:
+                                    prev = current
+                                    current = current.right
+                            break
                     #keep going
                     else:
                         prev = current
                         current = current.below
-                        
                 break
-        
+          
+        #below left
+        elif start_node.x > nodes[i].x and start_node.y < nodes[i].y:
+            #no nodes to below or to the left
+            if start_node.left == "" and start_node.below == "" and start_node.below_right == "":
+                start_node.below_right = nodes[i]
+            #nodes to the left
+            elif start_node.left != "":
+                prev = start_node
+                current = start_node.left
+                while True:
+                    #left of the current node
+                    if current.x >= nodes[i].x:
+                        #cant fo anymore right and cant go up
+                        if current.left == "" and current.below == "":
+                            current.below = nodes[i]
+                            nodes[i].above = current
+                            break
+                        #cant go right but can go down
+                        elif current.left == "" and current.below != "":
+                            prev = start_node
+                            current = start_node.below
+                            while True: 
+                                #left of current node
+                                if current.y > nodes[i].y:
+                                    if current.below == "":
+                                        nodes[i].above = current
+                                        current.below = nodes[i]
+                                        break
+                                #in between current and prev
+                                elif current.y < nodes[i].y:
+                                    current.above = nodes[i]
+                                    nodes[i].below = current
+                                    nodes[i].above = prev
+                                    prev.below = nodes[i]
+                                    break
+                                #keep going
+                                else:
+                                    prev = current
+                                    current = current.below
+                            break
+                    #doesnt need to go anymore left
+                    elif current.x <= nodes[i].x:
+                        #cant go down
+                        if current.below == "":
+                            current.below = nodes[i]
+                            nodes[i].above = current
+                            break
+                        #needs to go down
+                        if current.below != "":
+                            prev = start_node
+                            current = start_node.below
+                            while True: 
+                                #left of current node
+                                if current.y > nodes[i].y:
+                                    if current.below == "":
+                                        nodes[i].above = current
+                                        current.below = nodes[i]
+                                        break
+                                #in between current and prev
+                                elif current.y < nodes[i].y:
+                                    current.above = nodes[i]
+                                    nodes[i].below = current
+                                    nodes[i].above = prev
+                                    prev.below = nodes[i]
+                                    break
+                                #keep going
+                                else:
+                                    prev = current
+                                    current = current.below
+                            break
+                    else:
+                        prev = current
+                        current = current.left
+            #cant fo left but can go down
+            elif start_node.left == "" and start_node.below != "":
+                prev = start_node
+                current = start_node.below
+                while True:
+                    #below of current node
+                    if current.y > nodes[i].y:
+                        #cant fo down and cant go right
+                        if current.down == "" and current.left == "":
+                            nodes[i].left = current
+                            current.right = nodes[i]
+                            break
+                        #cant fo down but can go left
+                        elif current.below == "" and current.left != "":
+                            prev = current
+                            current = current.left
+                            while True: 
+                                #left of current node
+                                if current.x > nodes[i].x:
+                                    if current.left == "":
+                                        nodes[i].right = current
+                                        current.left = nodes[i]
+                                        break
+                                #in between current and prev
+                                elif current.x < nodes[i].x:
+                                    current.right = nodes[i]
+                                    nodes[i].left = current
+                                    nodes[i].right = prev
+                                    prev.left = nodes[i]
+                                    break
+                                #keep going
+                                else:
+                                    prev = current
+                                    current = current.left
+                    #doesnt need to go down anymore
+                    elif current.y < nodes[i].y:
+                        #cant go left
+                        if current.left == "":
+                            current.left = nodes[i]
+                            nodes[i].rigth = current
+                            break
+                        #needs to go left
+                        elif current.x < nodes[i].x:
+                            prev = current
+                            current = current.left
+                            while True: 
+                                #left of current node
+                                if current.x > nodes[i].x:
+                                    if current.left == "":
+                                        nodes[i].right = current
+                                        current.left = nodes[i]
+                                        break
+                                #in between current and prev
+                                elif current.x < nodes[i].x:
+                                    current.right = nodes[i]
+                                    nodes[i].left = current
+                                    nodes[i].right = prev
+                                    prev.left = nodes[i]
+                                    break
+                                #keep going
+                                else:
+                                    prev = current
+                                    current = current.left
+                            break
+                    #keep goiong
+                    else:
+                        prev = current
+                        current = current.below
+                break
+
     #print out nodes
     for i in nodes:
         nodes[i].print_node()
-
-    #print out paths
-
 
     return 0
 
