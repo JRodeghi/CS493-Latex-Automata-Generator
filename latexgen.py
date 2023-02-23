@@ -22,8 +22,15 @@ class Node:
         self.right = ""
         self.left = ""
 
+        self.printed = False
+
     def print_node(self):
+        loc =  ""
         state = "state"
+
+        if(self.printed == True):
+            return 0
+
         if(self.initial == True):
             state += ",initial"
         if(self.accepting == True):
@@ -32,16 +39,25 @@ class Node:
         if(self.right != ""):
             loc = "left of = " + self.right.label
         elif(self.left != ""):
-            loc = "right of =" + self.left.label
-        elif(self.above != ""):
-            loc = "below of =" + self.above.label
+                loc = "right of =" + self.left.label
         elif(self.below != ""):
-            loc = "above of = "+ self.below.label
+                loc = "above of = "+ self.below.label
+        elif(self.above != ""):
+                loc = "below of =" + self.above.label
+        elif(self.above_right != ""):
+                loc = "below left of = " + self.above_right.label
+        elif(self.above_left != ""):
+                loc = "below right of = " + self.above_left.label
+        elif(self.below_right != ""):
+                loc = "above left of = " + self.below_right.label
+        elif(self.below_left != ""):
+                loc = "above right of =" + self.below_left.label
 
         if self.initial == True:
             loc = ""
 
         print("\\node[" + state + "] (" + self.label + ") [" + loc + "] {$" + self.label + "$};")
+        self.printed = True
         
 
 
@@ -53,7 +69,7 @@ def layout_nodes(nodes,start):
         if nodes[i] == start_node:
             continue
         #right
-        if start_node.x < nodes[i].x and start_node.y + 10 > nodes[i].y and start_node.y - 10 < nodes[i].y:
+        if start_node.x < nodes[i].x and start_node.y + 100 > nodes[i].y and start_node.y - 100 < nodes[i].y:
             if start_node.right == "":
                 nodes[i].left = start_node
                 start_node.right = nodes[i]
@@ -80,7 +96,7 @@ def layout_nodes(nodes,start):
                         current = current.right
         
         #left 
-        elif start_node.x > nodes[i].x and start_node.y + 10 > nodes[i].y and start_node.y - 10 < nodes[i].y:
+        elif start_node.x > nodes[i].x and start_node.y + 100 > nodes[i].y and start_node.y - 100 < nodes[i].y:
             if start_node.left == "":
                 nodes[i].right = start_node
                 start_node.left = nodes[i]
@@ -107,7 +123,7 @@ def layout_nodes(nodes,start):
                         current = current.left
         
         #above (y is inverted for NFA - DFA)
-        elif start_node.y > nodes[i].y and start_node.x + 10 > nodes[i].x and start_node.x - 10 < nodes[i].x:
+        elif start_node.y > nodes[i].y and start_node.x + 100 > nodes[i].x and start_node.x - 100 < nodes[i].x:
             if start_node.above == "":
                 nodes[i].below = start_node
                 start_node.above = nodes[i]
@@ -133,7 +149,7 @@ def layout_nodes(nodes,start):
                         prev = current
                         current = current.above
         #below
-        elif start_node.y < nodes[i].y and start_node.x + 10 > nodes[i].x and start_node.x - 10 < nodes[i].x:
+        elif start_node.y < nodes[i].y and start_node.x + 100 > nodes[i].x and start_node.x - 100 < nodes[i].x:
             if start_node.below == "":
                 nodes[i].above = start_node
                 start_node.below = nodes[i]
@@ -163,6 +179,7 @@ def layout_nodes(nodes,start):
             # no nodes to the above or to the right 
             if start_node.right == "" and start_node.above == "" and start_node.above_right == "":
                 start_node.above_right = nodes[i]
+                nodes[i].below_left = start_node
             #nodes to the right but not above
             elif start_node.right != "":
                 prev = start_node
@@ -309,13 +326,14 @@ def layout_nodes(nodes,start):
             # no nodes to the above or to the left 
             if start_node.left == "" and start_node.above == "" and start_node.above_left == "":
                 start_node.above_left = nodes[i]
+                nodes[i].below_right = start_node
             #nodes to the left but not above
             elif start_node.left != "" :
                 prev = start_node
                 current = start_node.left
                 while True: 
                     #left of current node
-                    if current.x < nodes[i].x:
+                    if current.x > nodes[i].x:
                         #cant go anymore left and cant go up
                         if current.left == "" and current.above == "":
                             current.above = nodes[i]
@@ -344,9 +362,11 @@ def layout_nodes(nodes,start):
                                     prev = current
                                     current = current.above
                             break
-
+                        else:
+                            prev = current
+                            current = current.left
                     #doesnt need to go anymore left
-                    elif current.x > nodes[i].x:
+                    elif current.x < nodes[i].x:
                         #cant go up
                         if current.above == "":
                             current.above = nodes[i]
@@ -455,6 +475,7 @@ def layout_nodes(nodes,start):
             # no nodes to the below or to the right 
             if start_node.right == "" and start_node.below == "" and start_node.below_right == "":
                 start_node.below_right = nodes[i]
+                nodes[i].above_left = current
             #nodes to the right
             elif start_node.right != "":
                 prev = start_node
@@ -599,6 +620,7 @@ def layout_nodes(nodes,start):
             #no nodes to below or to the left
             if start_node.left == "" and start_node.below == "" and start_node.below_right == "":
                 start_node.below_right = nodes[i]
+                nodes[i].above_left = start_node
             #nodes to the left
             elif start_node.left != "":
                 prev = start_node
@@ -613,8 +635,8 @@ def layout_nodes(nodes,start):
                             break
                         #cant go right but can go down
                         elif current.left == "" and current.below != "":
-                            prev = start_node
-                            current = start_node.below
+                            prev = current
+                            current = current.below
                             while True: 
                                 #left of current node
                                 if current.y > nodes[i].y:
@@ -737,8 +759,11 @@ def layout_nodes(nodes,start):
                         current = current.below
                 break
 
+    nodes[start].print_node()
     #print out nodes
     for i in nodes:
+        if nodes[i] == start_node or nodes[i] == nodes[i].printed:
+            continue
         nodes[i].print_node()
 
     return 0
@@ -782,31 +807,82 @@ def parse_json(data):
                 if len(label) > 1 and k != len(label)-1:
                     str_label += ","
 
-            print("\\path (" + i['label'] + ") edge [bend right] node {$" , str_label , "$} (" + j +");")
+            if(i['label'] == j ):
+                print("\\path (" + i['label'] + ") edge [loop below] node {$" , str_label , "$} (" + j +");")
+            else:
+                print("\\path (" + i['label'] + ") edge [bend right] node {$" , str_label , "$} (" + j +");")
 
 #function to parse the text file fromt he STEM program
 def parse_stem(file):
-    return 0
+    nodes = {}
+    lines = file.readlines()
+    start_node = 0
 
+    for i in range(5,len(lines)):
+        if(lines[i] == "\n"):
+            break
+        
+        words = lines[i].split()
+
+        initial = False
+        accepting = False
+
+        if words[3] == "true":
+            initial = True
+        if words[4] == "true":
+            accepting = True
+
+        n = Node(words[0],"",accepting,initial,float(words[1]),float(words[2]) * -1)
+        if initial == True:
+            start_node = words[0]
+
+        nodes[words[0]] = n
+
+    layout_nodes(nodes,start_node)
+
+    for i in range(16,len(lines)):
+        if(lines[i] == "\n"):
+            break
+
+        words = lines[i].split()
+
+        from_node = words[0]
+        to_node = words[1]
+        move = ""
+
+        if words[len(words)-1] == "RIGHT":
+            move = "R"
+        if words[len(words)-1] == "LEFT":
+            move = "L"
+
+
+        if len(words) < 5:
+            if(from_node == to_node):
+                print("\\path (" + from_node + ") edge [loop above]   node {$ ||" + move+ "$} (" + to_node + ");")
+            else:
+                print("\\path (" + from_node + ") edge [bend right]   node {$ ||" + move+ "$} (" + to_node + ");")
+        else:
+            if(from_node == to_node):
+                print("\\path (" + from_node + ") edge [loop above]   node {$ " + words[1] + "|" + words[2] + "|"+ move+ "$} (" + to_node + ");")
+            else:
+                print("\\path (" + from_node + ") edge [bend right]   node {$ " + words[1] + "|" + words[2] + "|"+ move+ "$} (" + to_node + ");")
+                    
 def main(argv):
     inputfile = ''
     outputfile = ''
-    opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    opts, args = getopt.getopt(argv,"hi:",["ifile="])
     for opt, arg in opts:
         if opt == '-h':
-            print ('latexgen.py -i <inputfile> -o <outputfile>')
+            print ('latexgen.py -i <inputfile>')
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
-        elif opt in ("-o", "--ofile"):
-            outputfile = arg
-
-    file = open(inputfile)
-
     try:
+        file = open(inputfile)
         data = json.load(file)
         parse_json(data)
     except:
+        file = open(inputfile)
         parse_stem(file)
     
 
