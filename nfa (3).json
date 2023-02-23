@@ -1,0 +1,9 @@
+{"nodes":[
+    
+{"label":"1","loc":{"x":154,"y":108},"transitionText":{"2":["ε"],"3":["a"]}},
+{"label":"2","loc":{"x":535,"y":106},"transitionText":{},"acceptState":true},
+{"label":"3","loc":{"x":334,"y":362},"transitionText":{"2":["a","b"]}}],
+
+
+"fsa":{"states":["1","2","3"],"alphabet":["a","b"],
+"transitions":{"1":{"ε":["2"],"a":["3"]},"3":{"a":["2"],"b":["2"]}},"startState":"1","acceptStates":["2"]}}

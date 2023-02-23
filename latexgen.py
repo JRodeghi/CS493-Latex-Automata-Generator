@@ -23,19 +23,25 @@ class Node:
         self.left = ""
 
     def print_node(self):
+        state = "state"
         if(self.initial == True):
-            print("\\node[" + "state,initial" + "] (" + self.label + ") [""] {$" + self.label + "$};")
-        else:
-            if(self.right != ""):
-                loc = "left of = " + self.right.label
-            elif(self.left != ""):
-                loc = "right of =" + self.left.label
-            elif(self.above != ""):
-                loc = "below of =" + self.above.label
-            elif(self.below != ""):
-                loc = "above of = "+ self.below.label
+            state += ",initial"
+        if(self.accepting == True):
+            state += ",accepting"
+        
+        if(self.right != ""):
+            loc = "left of = " + self.right.label
+        elif(self.left != ""):
+            loc = "right of =" + self.left.label
+        elif(self.above != ""):
+            loc = "below of =" + self.above.label
+        elif(self.below != ""):
+            loc = "above of = "+ self.below.label
 
-            print("\\node[" + "state" + "] (" + self.label + ") [" + loc + "] {$" + self.label + "$};")
+        if self.initial == True:
+            loc = ""
+
+        print("\\node[" + state + "] (" + self.label + ") [" + loc + "] {$" + self.label + "$};")
         
 
 
@@ -747,14 +753,36 @@ def parse_json(data):
     #create nodes
     for i in node_data:
         initial = False
+        accepting = False
         if(i['label'] == data['fsa']['startState']):
             initial = True
+    
+        try:
+            if i["acceptState"] == True:
+                accepting = True
+        except:
+            accepting = False
 
-        n = Node(i['label'],i['transitionText'],False,initial,i['loc']['x'],i['loc']['y'])
-       
+        n = Node(i['label'],i['transitionText'],accepting,initial,i['loc']['x'],i['loc']['y'])
         nodes[i['label']] = n
     
     layout_nodes(nodes,data['fsa']['startState'])
+
+    #print the paths
+    for i in node_data:
+        for j in i['transitionText']:
+            label = i['transitionText'][j]
+            for k in range(len(label)):
+                if label[k] == 'Îµ':
+                    label[k] = "\\epsilon"
+            
+            str_label = ""
+            for k in range(len(label)):
+                str_label += label[k]
+                if len(label) > 1 and k != len(label)-1:
+                    str_label += ","
+
+            print("\\path (" + i['label'] + ") edge [bend right] node {$" , str_label , "$} (" + j +");")
 
 #function to parse the text file fromt he STEM program
 def parse_stem(file):

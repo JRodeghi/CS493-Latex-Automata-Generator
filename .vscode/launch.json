@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-i","square.json","-o","test.txt"]
+            "args": ["-i","nfa (3).json","-o","test.txt"]
         }
     ]
 }
